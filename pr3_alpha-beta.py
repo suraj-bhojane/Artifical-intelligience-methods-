@@ -1,19 +1,24 @@
-
 def print_board(board):
-    for row in board:
+    for i, row in enumerate(board):
         print(" | ".join(row))
-        print("-" * )
+        if i < 2:
+            print("-" * 5)  # horizontal line between rows
+
 
 def is_winner(board, player):
+    # Check rows and columns
     for i in range(3):
         if all(board[i][j] == player for j in range(3)) or all(board[j][i] == player for j in range(3)):
             return True
-    if all(board[i][i] == player for i in range(3)) or all(board[i][2-i] == player for i in range(3)):
+    # Check diagonals
+    if all(board[i][i] == player for i in range(3)) or all(board[i][2 - i] == player for i in range(3)):
         return True
     return False
 
+
 def is_full(board):
     return all(board[i][j] != ' ' for i in range(3) for j in range(3))
+
 
 def evaluate(board):
     if is_winner(board, 'X'):
@@ -21,6 +26,7 @@ def evaluate(board):
     elif is_winner(board, 'O'):
         return -10
     return 0
+
 
 def alpha_beta(board, depth, is_max, alpha, beta):
     score = evaluate(board)
@@ -38,7 +44,7 @@ def alpha_beta(board, depth, is_max, alpha, beta):
                     max_eval = max(max_eval, eval)
                     alpha = max(alpha, eval)
                     if beta <= alpha:
-                        break
+                        return max_eval  # prune remaining branches
         return max_eval
     else:
         min_eval = float('inf')
@@ -51,8 +57,9 @@ def alpha_beta(board, depth, is_max, alpha, beta):
                     min_eval = min(min_eval, eval)
                     beta = min(beta, eval)
                     if beta <= alpha:
-                        break
+                        return min_eval  # prune remaining branches
         return min_eval
+
 
 def find_best_move(board):
     best_val = -float('inf')
@@ -68,6 +75,7 @@ def find_best_move(board):
                     best_move = (i, j)
     return best_move
 
+
 if __name__ == "__main__":
     board = [[' ' for _ in range(3)] for _ in range(3)]
     print("Enter the current board state (use X, O, space):")
@@ -76,14 +84,14 @@ if __name__ == "__main__":
         row = list(row_str.ljust(3, ' '))
         board[i] = row
 
-    print("Current board:")
+    print("\nCurrent board:")
     print_board(board)
 
     if not is_full(board) and not is_winner(board, 'X') and not is_winner(board, 'O'):
         move = find_best_move(board)
-        print(f"Best move for X: {move}")
+        print(f"\nBest move for X: {move}")
         board[move[0]][move[1]] = 'X'
-        print("Board after move:")
+        print("\nBoard after move:")
         print_board(board)
     else:
-        print("Game over")
+        print("\nGame over")
