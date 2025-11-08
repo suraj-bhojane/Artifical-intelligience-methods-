@@ -1,42 +1,45 @@
-import heapq
+def prim_mst(graph, vertices):
+    V = len(vertices)
+    selected = [False] * V
+    selected[0] = True
+    edges = []
 
-def prim_mst(graph, start):
-    visited = set()
-    min_heap = [(0, start, -1)]  # (weight, vertex, parent)
-    total_weight = 0
-    mst_edges = []
+    print("\nEdges in MST with their weights:")
 
-    while min_heap:
-        weight, vertex, parent = heapq.heappop(min_heap)
-        if vertex in visited:
-            continue
-        visited.add(vertex)
-        total_weight += weight
-        if parent != -1:
-            mst_edges.append((parent, vertex, weight))
+    for _ in range(V - 1):
+        min_edge = 1000000
+        a = b = 0
+        for i in range(V):
+            if selected[i]:
+                for j in range(V):
+                    if not selected[j] and graph[i][j]:
+                        if graph[i][j] < min_edge:
+                            min_edge = graph[i][j]
+                            a, b = i, j
+        print(f"{vertices[a]} - {vertices[b]}: {graph[a][b]}")
+        edges.append((vertices[a], vertices[b], graph[a][b]))
+        selected[b] = True
 
-        for neighbor, w in graph[vertex]:
-            if neighbor not in visited:
-                heapq.heappush(min_heap, (w, neighbor, vertex))
+    return edges
 
-    print("\nEdges in the Minimum Spanning Tree:")
-    for u, v, w in mst_edges:
-        print(f"{u} - {v} (weight {w})")
-    print("Total cost of MST:", total_weight)
+# Input vertices as names
+V = int(input("Enter number of vertices: "))
+vertices = []
+for i in range(V):
+    name = input(f"Enter name of vertex {i+1}: ")
+    vertices.append(name)
 
+# Input edges
+E = int(input("Enter number of edges: "))
+graph = [[0]*V for _ in range(V)]
 
-# --- MAIN PROGRAM ---
-n = int(input("Enter number of vertices: "))
-e = int(input("Enter number of edges: "))
+print("Enter each edge as: vertex1 vertex2 weight")
+for _ in range(E):
+    u_name, v_name, w = input().split()
+    w = int(w)
+    u = vertices.index(u_name)
+    v = vertices.index(v_name)
+    graph[u][v] = w
+    graph[v][u] = w  # undirected graph
 
-graph = {i: [] for i in range(n)}
-
-print("Enter each edge in the format: u v weight")
-for _ in range(e):
-    u, v, w = map(int, input().split())
-    graph[u].append((v, w))
-    graph[v].append((u, w))  # undirected graph
-
-start = int(input(f"Enter the starting vertex (0 to {n-1}): "))
-
-prim_mst(graph, start)
+mst = prim_mst(graph, vertices)
